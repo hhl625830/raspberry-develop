@@ -17,53 +17,46 @@ import cv2
 import os
 import time
 
-resX = 640
-resY = 480
-# 这个是显示窗口大小
-
-# The face cascade file to be used
-face_cascade = cv2.CascadeClassifier('Cascades\haarcascade_frontalface_default.xml')
-# 这个xml文件是opencv里面自带的，官方已经训练好的检测文件
-face_color = (192, 220, 240)
-# 框人脸 线条的颜色 采用的RGB 三基色来搭配的，如果你要换成你喜欢的颜色  可以去调试
-strokeWeight = 3  # 这个是线条的宽度
 t_start = time.time()
 fps = 0
 
 
 # 人脸检测函数
 def get_faces(img):
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    cap = cv2.CascadeClassifier(
+        "Cascades/haarcascade_frontalface_default.xml"
+    )
+    faces = cap.detectMultiScale(
+        gray, scaleFactor=1.2, minNeighbors=3)
 
     return faces, img, gray
 
 
 # 画框函数，
 def draw_frame(faces, img, gray):
-    global xdeg
-    global ydeg
-    global fps
-    global time_t
 
-    for x, y, w, h in faces:
-        # 这个  x y w h 是两组坐标 代表的检测到人脸的顶点坐标(x,y)(w,h)
-        cv2.rectangle(img, (x, y), (x + w, y + h), face_color, strokeWeight)
-        cv2.putText(img, "Face No." + str(len(faces)), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        face_gray = gray[y:y + h, x:x + w]
+    global fps
+
+
+    if len(faces):
+        for face in faces:
+            x, y, w, h = face
+            cv2.rectangle(img, (x, y), (x + h, y + w), (0, 255, 0), 2)  # 框出人脸
+
     # 计算FPS
     fps = fps + 1
     sfps = fps / (time.time() - t_start)
     cv2.putText(img, "FPS : " + str(int(sfps)), (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-    cv2.imshow("Frame", img)
+    cv2.imshow("Image", img)
 
 
 if __name__ == '__main__':
 
     camera = cv2.VideoCapture(0)
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, resX)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, resY)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 
     pool = mp.Pool(processes=4)
 
