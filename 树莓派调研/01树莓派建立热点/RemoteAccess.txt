@@ -1,0 +1,123 @@
+ACCESS-POINT
+1.更新树莓派库
+	sudo apt-get update
+	sudo apt-get upgrade
+
+2.安装DNS HOST
+	sudo apt-get install dnsmasq hostapd
+3.关闭新装软件，准备建立热点的配置文件
+	sudo systemctl stop dnsmasq
+	sudo systemctl stop hostapd
+	备注： 如果是3B 出现依赖问题 请用sudo aptitude install hostapd 安装
+4.配置静态ip
+	我们正在配置一个独立的网络作为服务器，所以树莓派需要有一个静态IP地址分配到无线端口,
+	要配置静态IP地址，使用以下工具编辑dhcpcd配置文件:
+	sudo nano /etc/dhcpcd.conf
+	在文件末尾加上：
+	interface wlan0
+    static ip_address=192.168.18.1/24
+    nohook wpa_supplicant
+5.配置DHCP服务器(dnsmasq)
+	重命名这个配置文件，并编辑一个新的:
+	sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig  
+	sudo nano /etc/dnsmasq.conf
+	写入以下信息并保存
+	interface=wlan0      # Use the require wireless interface - usually wlan0
+	dhcp-range=192.168.18.2,192.168.18.254,255.255.255.0,24h
+6.配置热点连接信息(hostapd)
+	sudo nano /etc/hostapd/hostapd.conf
+	编辑/etc/hostapd/hostapd.的hostapd配置文件conf，为您的无线网络添加各种参数：
+	
+	interface=wlan0
+	driver=nl80211
+	ssid=Hwasmart
+	hw_mode=g
+	channel=7
+	wmm_enabled=0
+	macaddr_acl=0
+	auth_algs=1
+	ignore_broadcast_ssid=0
+	wpa=2
+	wpa_passphrase=01059403136
+	wpa_key_mgmt=WPA-PSK
+	wpa_pairwise=TKIP
+	rsn_pairwise=CCMP
+	配置文件到系统路径
+	sudo nano /etc/default/hostapd
+	找到带有#DAEMON_CONF的行，用这个替换它
+	DAEMON_CONF="/etc/hostapd/hostapd.conf"
+7.添加路由和伪装
+	sudo nano /etc/sysctl.conf  取消注释下面行
+	net.ipv4.ip_forward=1
+	
+	为eth0上的出站流量添加一个伪装
+	sudo iptables -t nat -A  POSTROUTING -o eth0 -j MASQUERADE
+	
+	保存iptables规则
+	
+	sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+	
+	sudo service dhcpcd restart & sudo systemctl start hostapd & sudo systemctl start dnsmasq
+	
+8.添加文件
+	sudo mkdir /home/pi/Public/AP
+	cd AP
+	一键建立热点文件
+	sudo cp /etc/dhcpcd.conf ./
+	
+	sudo nano /home/pi/Public/AP/access_point.py
+	复制下面代码 然后Ctrl + O 写入 Ctrl + x
+	import os
+	import time
+
+	import RPi.GPIO as GPIO
+
+	GPIO.setmode(GPIO.BCM)
+
+	GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setwarnings(False)
+
+	def create_ap():
+		os.system("sudo cp /home/pi/Public/AP/dhcpcd.conf /etc/")
+		os.system("sudo reboot")
+	def my_callback(channel):
+		print("button pressed!")
+		create_ap()
+		time.sleep(0.5)
+		pass
+
+	GPIO.add_event_detect(24, GPIO.RISING, callback=my_callback)
+	while True:
+		try:
+			print("I'm working...")
+			time.sleep(5)
+			pass
+		except KeyboardInterrupt:
+			break
+			pass
+		pass
+	GPIO.cleanup()
+	
+	将逻辑开关D引脚接到物理引脚 40号引脚 
+	
+9.建立开机启动
+	sudo nano /etc/rc.local
+	然后将
+	python3 /home/pi/Public/AP/access_point.py
+	添加到文件中exit 0 所在行之前的位置
+	
+	启动树莓派后 按下逻辑开关按键 稍等 6秒左右 就能在你的电脑看到树莓派建立的热点
+	Hwasmart  密码：01059403136
+	
+	
+	
+	
+		
+
+	
+	
+	
+	
+	
+	
+	

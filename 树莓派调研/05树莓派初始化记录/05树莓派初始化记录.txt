@@ -1,0 +1,91 @@
+01. 利用 SD Card Formatter 工具格式化SD卡
+02.	Etcher 工具安装系统  最新镜像下载地址 https://downloads.raspberrypi.org/raspbian_lite_latest
+03.树莓派初始配置：
+	1. 到根目录下新建一个名为ssh的空文件夹 开启树莓派远程功能
+	2. 定义一个wpa_supplicant.cof。用于特定无线网络的conf文件,将该文件放入引导文件夹，当Pi第一次引导时，
+	   它将把该文件复制到Linux根文件系统中的正确位置，并使用这些设置启动无线网络。(在无显示器情况下)
+	   
+	3.更新系统
+		
+		查看系统版本： lsb_release -a
+					No LSB modules are available.
+					Distributor ID:	Raspbian
+					Description:	Raspbian GNU/Linux 9.4 (stretch)
+					Release:	9.4
+					Codename:	stretc
+				
+				
+		选择和版本对应得镜像源：
+		添加镜像源：
+			pi@raspberrypi:~ $ sudo sed -i 's|//archive.raspberrypi.org|//mirrors.ustc.edu.cn/archive.raspberrypi.org|g' /etc/apt/sources.list.d/raspi.list
+			pi@raspberrypi:~ $ sudo sed -i 's|raspbian.raspberrypi.org|mirrors.ustc.edu.cn/raspbian|g' /etc/apt/sources.list
+		更新系统：
+		sudo aptitude update 更新可用的包列表
+		sudo aptitude upgrade 升级可用的包
+		sudo aptitude dist-upgrade 将系统升级到新的发行版
+		sudo rpi-update 更新树莓派固件
+		
+		树莓派配置：
+			命令行：
+				sudo raspi-config
+				
+			桌面窗口 坐上角图标 首选项===》 Raspberry Pi Configuration
+			根据自己需求进行配置
+			扩展文件系统：
+			sudo raspi-config
+				
+			
+	4. 树莓派python
+		更新pip,因树莓派存在2个版本，请指明pip的版本
+		
+		python3(2.7) -m pip install --upgrade pip
+		python3(2.7) -m pip install --upgrade setuptools
+	5. opencv
+		pip 安装opencv
+		sudo apt-get install libatlas3-base
+		sudo apt-get install libjasper1
+		sudo apt-get install libgst7
+		sudo apt-get install python3-gst-1.0
+		sudo apt-get install libqtgui4
+		sudo apt-get install libqt4-test
+		sudo apt-get install libhdf5-dev
+		
+		pip 
+		
+	6. python虚拟环境的配置
+	
+		1. 安装virtualenv
+		$ sudo aptitude install python-virtualenv
+		2. 创建开发环境
+		$ virtualenv env_name
+		3. 启用开发环境
+		$ cd env_name && source bin/activate
+		4. 退出开发环境
+		$ deactivate
+		6. 获得帮助
+		$ virtualenv -h
+		
+		常用参数：
+		$ virtualev --no-site-packages env_DIR         # 创建不允许访问系统全局site-packages目录的环境。（默认等于$ virtualev  env_DIR）
+
+		$ virtualev --system-site-packages env_DIR     # 创建继承系统全局site-packages目录的环境，也就是说可以使用系统之前安装的package。
+
+		$ virtualev --python=python3.5  env_DIR        # 创建指定python解析器的环境（绝对路径：$ virtualenv --python=/opt/python-3.3/bin/python ENV ）
+
+		$ virtualev --always-copy  env_DIR             # 拷贝文件到环境而不是创建连接
+
+		$ virtualenv --clear env_DIR                   # 清空非root用户安装的环境，重新创建环境。
+		
+		3.1. 生成可打包环境
+
+		某些特殊需求下,可能没有网络, 我们期望直接打包一个ENV, 可以解压后直接使用, 这时候可以使用virtualenv -relocatable指令将ENV修改为可更改位置的ENV
+
+		代码如下:
+
+		#对当前已经创建的虚拟环境更改为可迁移 
+		➜ ENV3.4 git:(master) ✗ virtualenv –relocatable ./ 
+		Making script ./bin/easy_install relative 
+		Making script ./bin/easy_install-3.4 relative 
+		Making script ./bin/pip relative 
+		Making script ./bin/pip3 relative 
+		Making script ./bin/pip3.4 relative

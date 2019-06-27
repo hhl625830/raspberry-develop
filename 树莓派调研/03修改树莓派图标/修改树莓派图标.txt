@@ -1,0 +1,1 @@
+替换/usr/share/raspberrypi-artwork 的同名图标

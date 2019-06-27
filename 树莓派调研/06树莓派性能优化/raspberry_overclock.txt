@@ -1,0 +1,67 @@
+USE AT YOUR OWN RISK!!
+
+How do I determine the current MHz?
+Run this in a terminal: 
+
+   sudo cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq
+
+It will display the maximum CPU frequence
+
+How can stress test or benchmark?
+
+This will install sysbench: sudo apt-get install sysbench
+
+This command will Run a prime number benchmark to 20000: sysbench --test=cpu --cpu-max-prime=20000 --num-threads=4 run
+Overclock profiles
+
+1.45Ghz CPU 500Mhz gpu Overclock profile
+
+arm_freq=1500
+gpu_freq=500
+core_freq=500
+sdram_freq=500
+sdram_schmoo=0x02000020
+over_voltage=2
+sdram_over_voltage=2
+
+1.5Ghz CPU NO gpu Overclock profile
+
+arm_freq=1500
+over_voltage=6
+
+
+1.5Ghz CPU 500Mhz gpu Overclock profile
+
+arm_freq=1500
+gpu_freq=500
+core_freq=500
+sdram_freq=500
+sdram_schmoo=0x02000020
+over_voltage=6
+sdram_over_voltage=2
+
+
+
+1.57Ghz CPU 500Mhz gpu Overclock profile
+
+arm_freq=1575
+gpu_freq=500
+core_freq=500
+sdram_freq=500
+sdram_schmoo=0x02000020
+over_voltage=6
+sdram_over_voltage=2
+
+
+
+1.6Ghz CPU 500Mhz gpu Overclock profile
+
+arm_freq=1600
+gpu_freq=500
+core_freq=500
+sdram_freq=500
+sdram_schmoo=0x02000020
+over_voltage=6
+sdram_over_voltage=2
+
+https://www.youtube.com/watch?v=SWl0n-uNdLc

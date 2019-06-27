@@ -1,0 +1,34 @@
+﻿hwa82967120  163网易邮箱授权码
+
+通过热点连接WIFI
+1.创建 wifi 配置文件
+	cd /home/pi/public/WIFI/
+	sudo cp /etc/dhcpcd.conf ./
+	sudo nano dhcpcd.conf 到文件末尾 删掉下面的并保存
+	nterface wlan0
+    static ip_address=192.168.18.1/24
+    nohook wpa_supplicant
+	
+2.通过热点连接WiFi访问web服务
+
+	将 connect_wifi 文件上传到 /home/pi/public/WIFI/下  可用lrzsz的rz命令  或者远程ftp工具自行选择
+3. 检查树莓派WIFI网络是否连接红灯闪烁代表没有连接到网络，请重新建立热点，输入正确的wifi名称和密码，红灯常亮
+	表示正常连接网络
+
+	将blinkled.py .py 文件上传到 /home/pi/public/WIFI/下
+
+4.设置开机自启动
+	9.建立开机启动
+	sudo nano /etc/rc.local
+	然后将
+	python3 /home/pi/Public/WIFI/check_network.py &
+	python3 /home/pi/Public/WIFI/connect_wifi/app.py &
+	添加到文件中exit 0 所在行之前的位置
+	
+	启动树莓派后 按下逻辑开关按键 稍等 6秒左右 就能在你的电脑看到树莓派建立的热点
+	Hwasmart  密码：01059403136
+	在你的浏览器访问 192.168.18.1:8080 后的连接wifi web页面 请输入正确的WiFi名称和密码 点击连接后
+	观察树莓派网络连接指示灯
+
+		
+	
